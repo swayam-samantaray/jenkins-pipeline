@@ -1,0 +1,161 @@
+﻿
+@using System.Collections.Generic
+
+<div class="container mt-4">
+    <h1>Input Controls Demo</h1>
+
+    <!-- Simple Controls -->
+    <h3>Simple Controls</h3>
+    <form>
+        <div class="mb-3">
+            <label for="textbox" class="form-label">Text Box</label>
+            <input type="text" id="textbox" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="numberfield" class="form-label">Number Field</label>
+            <input type="number" id="numberfield" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="datefield" class="form-label">Date Field</label>
+            <input type="date" id="datefield" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="dropdown" class="form-label">Dropdown</label>
+            <select id="dropdown" class="form-select">
+                <option value="">Select an option</option>
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+            </select>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" id="checkbox" class="form-check-input" />
+            <label for="checkbox" class="form-check-label">Check Box</label>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Radio Buttons</label><br />
+            <input type="radio" id="radio1" name="radioGroup" value="1" class="form-check-input" />
+            <label for="radio1" class="form-check-label">Option 1</label><br />
+            <input type="radio" id="radio2" name="radioGroup" value="2" class="form-check-input" />
+            <label for="radio2" class="form-check-label">Option 2</label>
+        </div>
+    </form>
+
+    <!-- Complex Controls -->
+    <h3>Complex Controls</h3>
+    <form>
+        <div class="mb-3">
+            <label for="searchable-dropdown" class="form-label">Searchable Dropdown</label>
+            <select id="searchable-dropdown" class="form-select"></select>
+        </div>
+
+        <div class="mb-3">
+            <label for="multiselect-dropdown" class="form-label">Multi-Select Dropdown</label>
+            <select id="multiselect-dropdown" class="form-select" multiple></select>
+        </div>
+    </form>
+
+    <!-- Sample Table -->
+    <h3>Sample Table</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>john.doe@example.com</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#searchable-dropdown').select2({
+            placeholder: "Search options",
+            data: [{ id: 1, text: 'Option 1' }, { id: 2, text: 'Option 2' }]
+        });
+
+        
+</script>
+
+
+
+<script>
+    $(document).ready(function () {
+        // Initialize Multi-Select Dropdown with Checkboxes
+        $('#multiselect-dropdown').select2({
+            placeholder: "Select multiple options",
+            closeOnSelect: false, // Keep dropdown open on selection
+            allowClear: true,    // Allow clearing selections
+            templateResult: formatOption, // Custom template for options
+            templateSelection: formatSelection // Custom template for selection
+        });
+
+        // Add options including the Select All
+        const data = [
+            { id: 'select_all', text: 'Select All' },
+            { id: 1, text: 'Option 1' },
+            { id: 2, text: 'Option 2' },
+            { id: 3, text: 'Option 3' }
+        ];
+        data.forEach(item => {
+            const option = new Option(item.text, item.id, false, false);
+            $('#multiselect-dropdown').append(option);
+        });
+        $('#multiselect-dropdown').trigger('change'); // Refresh dropdown
+
+        // Function to format the dropdown options (with checkboxes)
+        function formatOption(option) {
+            if (!option.id) return option.text; // If no ID, return plain text
+            const isChecked = $('#multiselect-dropdown').val()?.includes(option.id) ? 'checked' : '';
+            return $(`
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="checkbox-${option.id}" value="${option.id}" ${isChecked} />
+                    <label class="form-check-label" for="checkbox-${option.id}">${option.text}</label>
+                </div>
+            `);
+        }
+
+        // Function to format the selected items
+        function formatSelection(selection) {
+            // Exclude "Select All" from the displayed selections
+            if (selection.id === 'select_all') {
+                return null;
+            }
+            return selection.text || selection.id;
+        }
+
+        // Handle Select All functionality
+        $('#multiselect-dropdown').on('select2:select', function (e) {
+            const selectedValue = e.params.data.id;
+            if (selectedValue === 'select_all') {
+                // Select all items programmatically except "Select All"
+                $('#multiselect-dropdown option').prop('selected', true);
+                $('#multiselect-dropdown option[value="select_all"]').prop('selected', false);
+                $('#multiselect-dropdown').trigger('change');
+            }
+        });
+
+        $('#multiselect-dropdown').on('select2:unselect', function (e) {
+            const unselectedValue = e.params.data.id;
+            if (unselectedValue === 'select_all') {
+                // Unselect all items programmatically
+                $('#multiselect-dropdown option').prop('selected', false);
+                $('#multiselect-dropdown').trigger('change');
+            }
+        });
+    });
+</script>
+
+
